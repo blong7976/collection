@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>供应商报价</title>
+  <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+  <script src="https://unpkg.com/element-ui@2.0.3/lib/index.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/element-ui@2.0.3/lib/theme-chalk/index.css">
+  <style>
+    * {
+      padding: 0;
+      margin: 0
+    }
+
+    body {
+      padding: 20px
+    }
+
+    .inquiryPrice {
+      margin-bottom: 10px
+    }
+
+    .inquiryTable .current-row td {
+      /* background-color: #DCF8A8 !important; */
+    }
+
+    .filter-container {
+      margin-top: 36px;
+      text-align: center
+    }
+
+    .filter-container-right {
+      text-align: right;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <el-table :data="tableData" border class="inquiryTable" style="width: 100%"
+      :header-cell-style="{background:'#f5f7fa',color:'#909399'}" border style="width: 100%" highlight-current-row
+      @current-change="handleCurrentChange">
+
+      <el-table-column prop="name" label="询价名称" show-overflow-tooltip width="180" fixed>
+      </el-table-column>
+
+      <el-table-column prop="partsCode" label="原厂编码" width="180">
+      </el-table-column>
+
+      <el-table-column label="报价名称" width="180">
+        <template scope="scope">
+          <el-input v-model="scope.row.offer_title" size="small">
+          </el-input>
+        </template>
+      </el-table-column>
+
+      <el-table-column prop="partsNum" label="数量" width="50" align="center">
+      </el-table-column>
+
+      <el-table-column prop="remark" label="询价备注" show-overflow-tooltip width="180">
+      </el-table-column>
+
+      <el-table-column v-for="(item,index) in quality" :key="index" :label="item | partsStatus" width="120"
+        align="center">
+        <template scope="scope">
+          <el-input v-model="scope.row.priceList[item-1]" size="mini" prefix-icon="el-icon-edit" min="0"
+            class="inquiryPrice">
+          </el-input>
+          <el-select v-model="scope.row.protectDate[item-1]" size="mini" placeholder="质保">
+            <el-option label="一个月" value="1"></el-option>
+            <el-option label="三个月" value="3"></el-option>
+            <el-option label="半年" value="6"></el-option>
+            <el-option label="一年" value="12"></el-option>
+          </el-select>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="商家备注">
+        <template scope="scope">
+          <el-input v-model="scope.row.offerRemark" size="small">
+          </el-input>
+        </template>
+      </el-table-column>
+
+      <el-table-column label="询价图片" width="100" align="center" fixed="right">
+        <template scope="scope">
+          <img :src="scope.row.imgUrl" :onerror="errorGoodsImg" class="image" @click="see(scope.row.imgUrl)"
+            style="width:55px;max-height:55px;cursor:pointer;vertical-align: middle">
+        </template>
+      </el-table-column>
+
+    </el-table>
+
+    <el-form ref="form" label-width="80px" :inline="true" class="filter-container-right">
+      <el-form-item label="运费:" v-if="!hasfreight">
+        <el-input v-model="freight" size="mini" width="100"></el-input>
+      </el-form-item>
+      <el-form-item label="免运费">
+        <el-switch on-text="" off-text="" v-model="hasfreight"></el-switch>
+      </el-form-item>
+    </el-form>
+
+    <div class="filter-container">
+      <el-button type="primary" icon="el-icon-upload" @click="submit">报价</el-button>
+      <el-button type="warning" icon="el-icon-arrow-left">返回</el-button>
+    </div>
+
+  </div>
+
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        errorGoodsImg: "this.src='http://vunion.sxqcwx.com/common/noImg.jpg'",
+        freight: '',//运费
+        hasfreight: false,//免运费
+        currentRow: null,
+        quality: [1, 2, 3, 4, 5, 6],
+        tableData: [{
+          name: '发动机',
+          priceList: ['', '', '', '', '', ''],
+          protectDate: ['', '', '', '', '', ''],
+          partsCode: "gk5",
+          offer_title: '',
+          partsNum: '4',
+          remark: '急需2019款',
+          offerRemark: '',
+          imgUrl: 'http://img1.bitautoimg.com/autoalbum/files/20180802/725/0328197256_6.jpg',
+        }, {
+          name: '刹车片',
+          priceList: ['', '', '', '', '', ''],
+          protectDate: ['', '', '', '', '', ''],
+          partsCode: "S90",
+          offer_title: '',
+          partsNum: '1',
+          remark: '急需2019款',
+          offerRemark: '',
+          imgUrl: 'http://img2.bitautoimg.com/autoalbum/files/20180802/013/0403340132_6.jpg',
+        }],
+
+
+
+        // 企业购买的时候报价列表
+        offerList: [
+          {
+            id: "1bc77d3186a511e9a4822cfda1b97b70",
+            imgUrl: "",
+            inquiryId: "1bc4c91086a511e9a4822cfda1b97b70",
+            priceList: [null, null, null, null, null, null],
+            protectDate: null,
+            protectDateList: [null, null, null, null, null, null],
+            remark: "22",
+            price: null,
+            partsStatus: 2,
+            partsNum: 2,
+            partsName: "15A片式保险丝",
+            partsCode: "222",
+            offerTitle: null,
+            offerRemark: null,
+            offerPartsId: null
+          }
+        ]
+      },
+      filters: {
+        partsStatus: function (key) {
+          if (key == 1) {
+            return '原厂'
+          } else if (key == 2) {
+            return 'OEM'
+          } else if (key == 3) {
+            return '下线件'
+          } else if (key == 4) {
+            return '品牌'
+          } else if (key == 5) {
+            return '拆车件'
+          } else if (key == 6) {
+            return '再制造'
+          }
+        }
+      },
+      methods: {
+        handleCurrentChange(val) {
+          this.currentRow = val;
+        },
+        see(item) {
+          window.open(item)
+        },
+        submit() {
+          let postData = JSON.parse(JSON.stringify(this.tableData))
+          console.log(postData);
+
+        },
+      },
+    })
+  </script>
+</body>
+
+</html>

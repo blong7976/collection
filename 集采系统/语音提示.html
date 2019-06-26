@@ -1,0 +1,52 @@
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>企业中心</title>
+</head>
+
+<body bgcolor="#ffffff">
+
+  <button onclick="send()">发消息</button>
+
+  <button onclick="cleart()">关闭消息</button>
+
+  <video src="" id="videoPlay" style="display: none"></video>
+
+  <script language=javascript>
+
+
+    var title = document.title
+    var text = "您有新的消息，请注意查看"
+    var timerID
+
+    function send() {
+      newtext()
+      play()
+    }
+
+    function newtext() {
+      clearTimeout(timerID)
+      document.title = text.substring(1, text.length) + text.substring(0, 1)
+      text = document.title.substring(0, text.length)
+      timerID = setTimeout("newtext()", 350)
+    }
+
+    function cleart() {
+      document.title = title
+      clearTimeout(timerID)
+    }
+
+    function play() {
+      var video1 = document.getElementById("videoPlay");
+      var url = 'http://fjdx.sc.chinaz.com/files/download/sound1/201404/4331.wav'
+      video1.setAttribute('src', url)
+      video1.play();
+    }
+
+  </script>
+</body>
+
+</html>

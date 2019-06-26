@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>企业购买</title>
+  <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+  <script src="https://unpkg.com/element-ui@2.9.1/lib/index.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/element-ui@2.9.1/lib/theme-chalk/index.css">
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      border: 0;
+      font-family: '微软雅黑', Arial;
+      font-weight: inherit;
+      outline: 0;
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      box-sizing: border-box;
+    }
+
+    body {
+      padding: 20px;
+    }
+
+    /*表格边框合并，边框距零*/
+    table {
+      background-color: #fcfcfc;
+      border-collapse: collapse;
+      border-spacing: 0;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      font-family: '微软雅黑', Arial;
+      font-weight: inherit;
+      outline: 0;
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      box-sizing: border-box;
+    }
+
+    .tables {
+      width: 100%;
+      margin-bottom: 30px;
+    }
+
+    td,
+    th {
+      width: auto;
+      position: relative;
+      border: 1px solid #ebeef5;
+      height: 40px;
+      font-size: 14px;
+      text-align: left;
+      padding: 0 10px;
+    }
+
+    th {
+      color: #909399;
+    }
+
+    td {
+      color: #606266
+    }
+
+    .tagles {
+      display: table-cell;
+      width: 120px;
+      overflow: hidden;
+      white-space: nowrap;
+
+    }
+
+    .tables .tag span {
+      display: block;
+      line-height: 30px;
+      text-align: center;
+    }
+
+    .tag-radio,
+    .tag-subtotal {
+      text-align: center
+    }
+
+    .tag-subtotal {
+      color: #909399
+    }
+
+    .tag {
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      box-sizing: border-box;
+      transition: .2s ease;
+    }
+
+    .tag:hover {
+      /* background-color: gold */
+    }
+
+    .tag:hover,
+    .tag.active {
+      -webkit-box-shadow: inset 0 0 3px red;
+      box-shadow: inset 0 0 3px red;
+    }
+
+    .tag:hover em,
+    .tag.active em {
+      display: block;
+    }
+
+    .tag span:first-child {
+      color: orangered;
+      font-size: 16px;
+    }
+
+    .tag span:last-child {
+      font-size: 12px;
+    }
+
+    .tag em {
+      width: 30px;
+      height: 30px;
+      background: red;
+      position: absolute;
+      right: -15px;
+      top: -15px;
+      transform: rotate(45deg);
+      transition: .2s ease;
+      display: none;
+    }
+
+    .subtotals {
+      /* color: orangered; */
+      font-size: 16px;
+    }
+
+    .has-gutter {
+      color: #606266;
+    }
+
+    .has-gutter td:first-child {
+      text-align: left;
+    }
+
+    .filter-container {
+      text-align: center;
+      margin-top: 45px;
+      position: relative;
+    }
+
+    .total {
+      text-align: center;
+      float: left;
+      margin-right: 20px;
+    }
+
+    .total em {
+      color: orangered
+    }
+
+    .selects {
+      background-color: #fff8e1
+    }
+
+    .float-bar-wrapper {
+      position: relative;
+      height: 50px;
+      overflow: hidden;
+      background: #e5e5e5;
+      padding-left: 20px;
+      line-height: 50px;
+    }
+
+    .float-bar-left {
+      float: left;
+    }
+
+    .float-bar-left .cancel {
+      float: left;
+      cursor: pointer;
+    }
+
+    .total .price {
+      color: #f40;
+      font-weight: 400;
+      font-size: 18px;
+      line-height: 48px;
+      font-family: Arial;
+      vertical-align: middle;
+    }
+
+    .total .price em {
+      font-weight: 700;
+      font-size: 22px;
+      padding: 0 3px;
+    }
+
+    .total-symbol {
+      font-size: 14px;
+      color: #f40;
+      font-family: verdana;
+    }
+
+    .float-bar-right {
+      float: right;
+    }
+
+    .float-bar-right .price {
+      float: left;
+      font-weight: 400;
+      font-family: Arial;
+      font-size: 14px;
+    }
+
+    .float-bar-right .price em {
+      font-weight: 400;
+      font-family: Arial;
+      font-size: 22px;
+      color: #f40
+    }
+
+    .float-bar-right .btn {
+      float: left;
+      width: 200px;
+      height: 50px;
+      line-height: 50px;
+      font-size: 18px;
+      margin-left: 50px;
+      vertical-align: top;
+      background: #ff6700;
+      color: #fff;
+      text-align: center;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <div id='app'>
+    <table v-for='(item,index) in list' :key='index' :class="item.select?'tables selects':'tables'">
+      <thead>
+        <tr>
+          <th>询价名称</th>
+          <th>报价名称</th>
+          <th>编码</th>
+          <th>数量</th>
+          <th>询价备注</th>
+          <th v-for="(i,idx) in item.listcont[0].quality" :key="i" class="tag-radio">
+            {{i.pz | partsStatus}}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(v,k) in item.listcont" :key="k">
+          <!-- <td :rowspan="item.listcont.length" v-if="k==0">{{item.merchants}}</td> -->
+          <td>{{v.EnquiryName}}</td>
+          <td>{{v.OfferName}}</td>
+          <td>{{v.encoding}}</td>
+          <td>{{v.number}}</td>
+          <td>{{v.EnquiryType}}</td>
+          <td v-for="(u,p) in v.quality" :key="p" :class="u.select?'tag active':'tag'"
+            @click="selectGood(item,index,u,v)">
+            <span v-if="u.price">{{'￥'+u.price}}</span>
+            <span v-else style="color: #ddd">未报价</span>
+            <span v-if="u.prote">质保：{{u.prote | assurance}}</span>
+            <span v-else style="color: #ddd">质保：~</span>
+            <em></em>
+          </td>
+        </tr>
+        <tr class="has-gutter">
+          <td colspan="4">运费：￥{{item.freight}}</td>
+          <td>小计</td>
+          <td v-for="(w,r) in item.subtotal" :key="r" class="tag-subtotal">
+            <span class="subtotals" v-if="w>0">{{'￥'+w}}</span>
+            <span class="subtotals" v-else style="color: #ddd">{{'￥'+w}}</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="float-bar-wrapper">
+      <div class="float-bar-left">
+        <div class="total">已选择 <em>{{good.length}}</em> 件
+        </div>
+        <div class="cancel" v-if="good.length>0" @click="cancel">取消</div>
+      </div>
+      <div class="float-bar-right" @click="submit" icon="el-icon-shopping-cart-2">
+        <strong class="price">合计：<span class="total-symbol">&nbsp;￥</span><em>{{total?total:'0.00'}}</em></strong>
+        <div class="btn">结算</div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    var vm = new Vue({
+      el: '#app',
+      data: {
+        total: '', //合计金额
+        good: [], //选择的商品信息
+        list: [
+          {
+            merchants: '商家A',
+            freight: '50',
+            listcont: [
+              {
+                EnquiryName: '飞度1.5L机油',
+                OfferName: '飞度1.5L机油',
+                encoding: 'A-1GK2109',
+                number: '1',
+                EnquiryType: '最快什么时候能到',
+                quality: [
+                  { price: 10, id: 'A-1-1', prote: '1', pz: 1, select: false },
+                  { price: 11, id: 'A-1-2', prote: '1', pz: 2, select: false },
+                  { price: null, id: 'A-1-3', prote: null, pz: 3, select: false },
+                  { price: 12, id: 'A-1-4', prote: '1', pz: 6, select: false },
+                ],
+              }, {
+                EnquiryName: '天籁1.5L机油',
+                OfferName: '飞度1.5L机油',
+                encoding: 'A-2GK2109',
+                number: '1',
+                EnquiryType: '最快什么时候能到',
+                quality: [
+                  { price: 13, id: 'A-2-1', prote: '1', pz: 1, select: false },
+                  { price: 14, id: 'A-2-2', prote: '1', pz: 2, select: false },
+                  { price: null, id: 'A-2-3', prote: null, pz: 3, select: false },
+                  { price: 15, id: 'A-2-4', prote: '1', pz: 6, select: false },
+                ],
+              }, {
+                EnquiryName: '天籁1.5L机油',
+                OfferName: '飞度1.5L机油',
+                encoding: 'A-3GK2109',
+                number: '1',
+                EnquiryType: '最快什么时候能到',
+                quality: [
+                  { price: 16, id: 'A-2-1', prote: '1', pz: 1, select: false },
+                  { price: 17, id: 'A-2-2', prote: '1', pz: 2, select: false },
+                  { price: null, id: 'A-2-3', prote: null, pz: 3, select: false },
+                  { price: 18, id: 'A-2-4', prote: '1', pz: 6, select: false },
+                ],
+              }
+            ]
+          },
+          {
+            merchants: '商家B',
+            freight: '80',
+            listcont: [
+              {
+                EnquiryName: '飞度1.5L机油',
+                OfferName: '飞度1.5L机油',
+                encoding: 'B-1GK2109',
+                number: '1',
+                EnquiryType: '最快什么时候能到',
+                quality: [
+                  { price: 21, id: 'A-2-1', prote: '1', pz: 1, select: false },
+                  { price: 22, id: 'A-2-2', prote: '1', pz: 2, select: false },
+                  { price: null, id: 'A-2-3', prote: null, pz: 3, select: false },
+                  { price: 23, id: 'A-2-4', prote: '1', pz: 6, select: false },
+                ],
+              }, {
+                EnquiryName: '天籁1.5L机油',
+                OfferName: '飞度1.5L机油',
+                encoding: 'B-2GK2109',
+                number: '1',
+                EnquiryType: '最快什么时候能到',
+                quality: [
+                  { price: 24, id: 'A-2-1', prote: '1', pz: 1, select: false },
+                  { price: 25, id: 'A-2-2', prote: '1', pz: 2, select: false },
+                  { price: null, id: 'A-2-3', prote: null, pz: 3, select: false },
+                  { price: 25, id: 'A-2-4', prote: '1', pz: 6, select: false },
+                ],
+              }, {
+                EnquiryName: '天籁1.5L机油',
+                OfferName: '飞度1.5L机油',
+                encoding: 'B-3GK2109',
+                number: '1',
+                EnquiryType: '最快什么时候能到',
+                quality: [
+                  { price: 27, id: 'A-2-1', prote: '1', pz: 1, select: false },
+                  { price: 28, id: 'A-2-2', prote: '1', pz: 2, select: false },
+                  { price: null, id: 'A-2-3', prote: null, pz: 3, select: false },
+                  { price: 29, id: 'A-2-4', prote: '1', pz: 6, select: false },
+                ],
+              }
+            ]
+          },
+        ]
+
+      },
+      filters: {
+        // 品质转换
+        partsStatus: function (key) {
+          if (key == 1) {
+            return '原厂'
+          } else if (key == 2) {
+            return 'OEM'
+          } else if (key == 3) {
+            return '下线件'
+          } else if (key == 4) {
+            return '品牌'
+          } else if (key == 5) {
+            return '拆车件'
+          } else if (key == 6) {
+            return '再制造'
+          }
+        },
+        // 质保转换
+        assurance: function (key) {
+          switch (key) {
+            case '1':
+              return '一个月'
+              break;
+            case '3':
+              return '三个月'
+              break;
+            case '6':
+              return '半年'
+              break;
+            case '12':
+              return '一年'
+              break;
+            default:
+              return '暂无'
+          }
+        }
+      },
+      created() {
+        this.init()
+      },
+      mounted() {
+
+      },
+      methods: {
+        // 初始化数据
+        init: function () {
+          this.list.forEach((v, i) => {
+            let arr = [];
+            for (let j = 0; j < v.listcont[0].quality.length; j++) {
+              let conse = 0;
+              for (let i = 0; i < v.listcont.length; i++) {
+                conse += v.listcont[i].quality[j].price
+              }
+              arr.push(conse)
+            }
+            v.select = false;
+            v.subtotal = arr;
+          })
+        },
+
+
+        // 选择商品
+        selectGood: function (item, index, u, v) {
+          this.list.forEach((v, i) => {
+            v.select = false
+            if (i != index) {
+              v.listcont.forEach((m, j) => {
+                m.quality.forEach(e => {
+                  e.select = false
+                })
+              })
+            }
+          })
+          v.quality.forEach(m => {
+            m.select = false
+          })
+
+          item.select = true
+          if (u.price) {
+            u.select = !u.select
+          }
+          this.sub()
+        },
+
+        //计算金额和列表
+        sub() {
+          let arra = [], arrb = [], totals = 0;
+          this.list.forEach((v, i) => {
+            v.listcont.forEach((m, j) => {
+              m.quality.forEach(e => {
+                e.number = m.number
+                arra.push(e)
+              })
+            })
+          })
+          for (let j = 0; j < arra.length; j++) {
+            if (arra[j].select) {
+              arrb.push(arra[j])
+              totals += arra[j].price
+            }
+          }
+          this.good = arrb
+          this.total = totals
+        },
+
+        // 取消选择
+        cancel() {
+          this.list.forEach((v, i) => {
+            v.select = false
+            v.listcont.forEach((m, j) => {
+              m.quality.forEach(e => {
+                e.select = false
+              })
+            })
+          })
+          this.sub()
+        },
+
+        // 提交订单
+        submit: function () {
+          this.sub()
+          console.log(this.good)
+        },
+
+      }
+    })
+
+
+  </script>
+</body>
+
+</html>
