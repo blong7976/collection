@@ -1,4 +1,4 @@
-<h1>精品Css</h1>
+<h2>精品css</h2>
 body{
     background-color: #fff;
     color: #24292e;
